@@ -21,14 +21,23 @@ func NewUserService(conf config.AppConfig, repo interfaces.UserRepository) inter
 	}
 }
 
-func (s *UserService) Register(user *dto.Register) (dto.Register, error) {
+func (s *UserService) Register(user *dto.Register) (dto.ResponseRegister, error) {
 	// bcrypt password
 	pass, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 
 	// set password
 	user.Password = string(pass)
 
-	return s.repo.Register(user)
+	res, err := s.repo.Register(user)
+	var response dto.ResponseRegister
+	if err != nil {
+		return response, err
+	}
+	response.ID = res.ID
+	response.Username = res.Username
+	response.Email = res.Email
+	response.Age = res.Age
+	return response, nil
 }
 
 func (s *UserService) Login(email, password string) (string, error) {

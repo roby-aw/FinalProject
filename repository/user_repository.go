@@ -19,7 +19,7 @@ func NewUserRepository(db *gorm.DB) interfaces.UserRepository {
 	}
 }
 
-func (r *userrepository) Register(register *dto.Register) (dto.Register, error) {
+func (r *userrepository) Register(register *dto.Register) (entity.User, error) {
 	user := entity.User{
 		Email:    register.Email,
 		Password: register.Password,
@@ -30,10 +30,9 @@ func (r *userrepository) Register(register *dto.Register) (dto.Register, error) 
 	result := r.DB.Model(&user).Create(&user)
 
 	if result.RowsAffected < 1 {
-		return *register, result.Error
+		return user, result.Error
 	}
-
-	return *register, nil
+	return user, nil
 }
 
 func (r *userrepository) Login(email, password string) (dto.Login, error) {
